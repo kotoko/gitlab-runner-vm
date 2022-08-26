@@ -1,0 +1,276 @@
+---
+
+- name: 'Provision Ubuntu Server with gitlab-runner installed'
+  hosts: default
+  become: true
+  tasks:
+    - name: 'remove cloud-init'
+      apt:
+        name: 'cloud-init'
+        force: true
+        state: 'absent'
+
+    - name: 'disable unattended-upgrades'
+      copy:
+        src: 'files/20auto-upgrades'
+        dest: '/etc/apt/apt.conf.d/20auto-upgrades'
+        owner: 'root'
+        mode: '644'
+
+    - name: 'update apt cache'
+      apt:
+        update_cache: true
+
+    - name: 'gitlab-runner'
+      block:
+        - name: 'get gitlab-runner deb package'
+          get_url:
+            url: 'https://gitlab-runner-downloads.s3.amazonaws.com/latest/deb/gitlab-runner_amd64.deb'
+            dest: '/tmp/gitlab-runner.deb'
+
+        - name: 'install gitlab-runner'
+          apt:
+            deb: '/tmp/gitlab-runner.deb'
+
+        - name: 'clean up gitlab-runner deb file'
+          file:
+            state: absent
+            path: '/tmp/gitlab-runner.deb'
+
+        - name: 'create directories for gitlab-runner'
+          loop:
+            - '/gitlab-runner'
+            - '/gitlab-runner/builds'
+            - '/gitlab-runner/cache'
+          file:
+            path: '{{ item }}'
+            state: directory
+            mode: '755'
+            owner: 'gitlab-runner'
+            group: 'gitlab-runner'
+
+        - name: 'copy initial file /etc/gitlab-runner/config.toml'
+          copy:
+            src: 'files/gitlab_runner_config.toml'
+            dest: '/etc/gitlab-runner/config.toml'
+            owner: 'root'
+            mode: '644'
+
+        - name: 'fix directory permissions on boot'
+          loop:
+            - '/gitlab-runner/builds'
+            - '/gitlab-runner/cache'
+          cron:
+            name: 'fix {{ item }} permissions'
+            user: 'root'
+            special_time: 'reboot'
+            job: '/usr/bin/chown gitlab-runner:gitlab-runner {{ item }}'
+
+        - name: 'configure cron for deleting outdated docker containers'
+          loop:
+            - 'daily'
+            - 'reboot'
+          cron:
+            name: 'clean up docker containers created by gitlab-runner'
+            user: 'root'
+            special_time: '{{ item }}'
+            job: '/bin/bash /usr/share/gitlab-runner/clear-docker-cache prune'
+
+        - name: 'copy script register-gitlab-runner.sh'
+          copy:
+            src: 'files/register-gitlab-runner.sh'
+            dest: '/root/register-gitlab-runner.sh'
+            owner: 'root'
+            mode: '700'
+
+        - name: 'copy scripts to /root'
+          loop:
+            - 'fix-git-dubious-ownership.sh'
+            - 'print-free-space.sh'
+          copy:
+            src: 'files/{{ item }}'
+            dest: '/root/{{ item }}'
+            owner: 'root'
+            mode: '755'
+
+        - name: 'set permissions 711 for /root'
+          file:
+            path: '/root'
+            state: directory
+            mode: '711'
+            owner: 'root'
+            group: 'root'
+
+    - name: 'add apt repositories for packages'
+      block:
+        - name: 'create directory /etc/apt/keyrings'
+          file:
+            path: '/etc/apt/keyrings'
+            state: directory
+            mode: '755'
+
+        - name: 'add key for apt repo for docker'
+          shell:
+            executable: '/bin/bash'
+            cmd: 'curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && chmod a+r /etc/apt/keyrings/docker.gpg'
+            warn: false
+
+        - name: 'add apt repo for docker'
+          apt_repository:
+            repo: 'deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable'
+            state: present
+
+        - name: 'add apt repo for git'
+          apt_repository:
+            repo: 'ppa:git-core/ppa'
+
+        - name: 'add apt repo for go-lang'
+          apt_repository:
+            repo: 'ppa:longsleep/golang-backports'
+
+        - name: 'update apt cache'
+          apt:
+            update_cache: true
+
+    - name: 'install packages'
+      apt:
+        pkg:
+          - git
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+          - libnss3-tools
+          - findutils
+          - screen
+          - tmux
+          - bzip2
+          - pbzip2
+          - lbzip2
+          - gzip
+          - pigz
+          - lz4
+          - xz-utils
+          - zip
+          - unzip
+          - zstd
+          - neofetch
+          - bash-static
+        state: present
+
+    - name: 'install packages and tools for compilation'
+      apt:
+        pkg:
+          - bash
+          - dash
+          - python3
+          - python3-venv
+          - sed
+          - build-essential
+          - clang
+          - clang-tidy
+          - clang-format
+          - g++
+          - gcc
+          - golang-go
+          - libcmocka-dev
+          - libsqlite3-dev
+          - libssl-dev
+          - autoconf
+          - autotools-dev
+          - make
+          - cmake
+          - ninja-build
+          - meson
+        state: present
+
+    - name: 'setup additional disk for buliding'
+      block:
+        - name: 'create directory /mnt/disk-builds'
+          file:
+            path: '/mnt/disk-builds'
+            state: directory
+            mode: '755'
+            owner: 'root'
+            group: 'root'
+
+        - name: 'add second disk to fstab'
+          mount:
+            src: 'LABEL=GR-BUILDS'
+            path: '/mnt/disk-builds'
+            fstype: ext4
+            state: present
+            opts: 'rw,noatime,nodiratime,data=ordered,commit=60,errors=remount-ro'
+
+        - name: 'add bind mounts to external disk to fstab'
+          loop:
+            - src: '/mnt/disk-builds/tmp'
+              path: '/tmp'
+            - src: '/mnt/disk-builds/var-tmp'
+              path: '/var/tmp'
+            - src: '/mnt/disk-builds/gitlab-runner-builds'
+              path: '/gitlab-runner/builds'
+            - src: '/mnt/disk-builds/gitlab-runner-cache'
+              path: '/gitlab-runner/cache'
+            - src: '/mnt/disk-builds/docker'
+              path: '/var/lib/docker'
+          mount:
+            src: '{{ item.src }}'
+            path: '{{ item.path }}'
+            opts: bind
+            state: present
+            fstype: none
+
+    - name: 'clean up /tmp at boot'
+      cron:
+        name: 'clean up /tmp at boot'
+        user: 'root'
+        special_time: 'reboot'
+        job: '/usr/bin/find /tmp -mindepth 1 -depth -cmin +5 -delete'
+
+    - name: 'disable su command for gitlab-runner user'
+      block:
+        - name: 'disable su command for gitlab-runner user part 1/2'
+          loop:
+            - '/etc/pam.d/common-session'
+            - '/etc/pam.d/common-session-noninteractive'
+          lineinfile:
+            path: '{{ item }}'
+            line: 'session required pam_limits.so'
+            state: present
+            create: true
+
+        - name: 'disable su command for gitlab-runner user part 2/2'
+          lineinfile:
+            path: '/etc/pam.d/su'
+            line: 'auth required pam_wheel.so deny group=gitlab-runner'
+            state: present
+            create: true
+
+    - name: 'make ssh server secure'
+      block:
+        - name: 'sshd: ChallengeResponseAuthentication no'
+          lineinfile:
+            path: '/etc/ssh/sshd_config'
+            regexp: '^ChallengeResponseAuthentication[ ]*[a-z ]*$'
+            line: 'ChallengeResponseAuthentication no'
+            create: true
+
+        - name: 'sshd: PasswordAuthentication no'
+          lineinfile:
+            path: '/etc/ssh/sshd_config'
+            regexp: '^PasswordAuthentication[ ]*[a-z ]*$'
+            line: 'PasswordAuthentication no'
+            create: true
+
+        - name: 'sshd: PubkeyAuthentication yes'
+          lineinfile:
+            path: '/etc/ssh/sshd_config'
+            regexp: '^PubkeyAuthentication[ ]*[a-z ]*$'
+            line: 'PubkeyAuthentication yes'
+            create: true
+
+        - name: 'disable ssh for account gitlab-runner'
+          shell:
+            executable: '/bin/bash'
+            cmd: 'echo -e "Match User gitlab-runner\n    PasswordAuthentication no\n    PubkeyAuthentication no" >> /etc/ssh/sshd_config'

@@ -1,0 +1,4 @@
+concurrent = 1
+check_interval = 0
+log_format = "runner"
+output_limit = 51200

@@ -1,0 +1,70 @@
+#cloud-config
+autoinstall:
+  version: 1
+  early-commands:
+    - 'sudo systemctl stop ssh'  # Stop ssh for packer
+  refresh-installer:
+    update: true
+  apt:
+    primary:
+      - arches: [default]
+        uri: 'http://pl.archive.ubuntu.com/ubuntu/'
+  debconf-selections: |
+    choose-mirror-bin mirror/http/proxy string
+  keyboard:
+    layout: pl
+  locale: pl_PL.UTF-8
+  identity:
+    hostname: ubuntu-server
+    realname: user1
+    username: user1
+    password: '$6$cb2RHYEQYgdziRyY$0baLTy7jvaL4dQelHI/UlnqVL6ikwm8YyFtkoB7YerkO4rW5pr9dabXcqAQHkn2joR.IuEufxmOSATpGErW.q/'  # openssl passwd -6 user1
+  storage:
+    layout:
+      name: direct
+    swap:
+      filename: swap.img
+      size: 2GB
+  network:
+    version: 2
+    ethernets:
+      ens3:
+        optional: true
+        dhcp4: yes
+        dhcp6: yes
+      enp1s0:
+        optional: true
+        dhcp4: yes
+        dhcp6: yes
+  ssh:
+    install-server: yes
+    allow-pw: yes
+  user-data:
+    timezone: Europe/Warsaw
+    disable_root: false
+    chpasswd:
+      list: |
+        root:root
+        user1:user1
+      expire: false
+  packages:
+    - apt-offline
+    - ca-certificates
+    - curl
+    - efibootmgr
+    - fdisk
+    - gdisk
+    - gnupg
+    - gzip
+    - lsb-release
+    - mosh
+    - net-tools
+    - nfs-common
+    - python3
+    - python-is-python3
+    - samba-common-bin
+    - sed
+    - qemu-guest-agent
+    - vim
+    - wget
+    - xz-utils
