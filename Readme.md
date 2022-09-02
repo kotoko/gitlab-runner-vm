@@ -21,6 +21,7 @@ Creating virtual machine image:
   - e2fsprogs
 * 4 GB or more RAM
 * 20 GB or more free space on disk
+* CPU architecture: amd64 (x86_64)
 
 Virtual machine:
 
