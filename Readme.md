@@ -48,6 +48,30 @@ sudo ./gitlab-runner-create-disk-builds.sh 50
 
 Parameter `50` means disk size is 50 GB. Image will be `out/gr-disk-builds-50G.qcow2`. It is `qcow2` file format. Disk is empty in the beginning so even if virtual size is 50 GB file will be only few megabytes. Size of file will grow over time.
 
+### Error "failed to handshake"
+
+It is possible that generating virtual machine fails with error "failed to handshake". [It is problem with packer](https://github.com/hashicorp/packer-plugin-ansible/issues/69). Packer by default uses outdated algorithms (disabled in official openssh release) when connecting through ssh. If you have recent ssh client version (you should have) then this error will appear.
+
+As a workaround you can re-enable old algorithms when connecting. Edit file `gitlab-runner.pkr.hcl` and uncomment 3 lines with workaround near the end of file.
+
+Original file:
+
+```
+    #ansible_ssh_extra_args = [
+    #  "-oHostKeyAlgorithms=+ssh-rsa -oPubkeyAcceptedKeyTypes=+ssh-rsa"
+    #]
+```
+
+After uncommenting:
+
+```
+    ansible_ssh_extra_args = [
+      "-oHostKeyAlgorithms=+ssh-rsa -oPubkeyAcceptedKeyTypes=+ssh-rsa"
+    ]
+```
+
+Generate virtual machine image again.
+
 ## Run virtual machine
 
 There are 2 user accounts configured: `root` (administrator) and `user1` (normal account with ability to sudo as root). Password is the same as login.
