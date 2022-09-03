@@ -8,6 +8,7 @@ CACHE_DIR='/gitlab-runner/cache'
 FF_ENABLE_JOB_CLEANUP='FF_ENABLE_JOB_CLEANUP=1'
 FF_SCRIPT_SECTIONS='FF_SCRIPT_SECTIONS=1'
 FF_USE_FASTZIP='FF_USE_FASTZIP=1'
+FF_NETWORK_PER_BUILD='FF_NETWORK_PER_BUILD=1'
 
 
 if [ "$#" -ne 1 ] && [ "$#" -ne 2 ]; then
@@ -67,6 +68,7 @@ gitlab-runner register \
 	--docker-volumes '/root/print-free-space.sh:/host/print-free-space.sh:ro' \
 	--pre-clone-script '/host/bash-static /host/fix-git-dubious-ownership.sh' \
 	--pre-build-script '/host/bash-static -c "/host/bash-static /host/neofetch --backend off ; /host/bash-static /host/fix-git-dubious-ownership.sh ; /host/bash-static /host/print-free-space.sh"' \
+	--env "$FF_NETWORK_PER_BUILD" \
 	--env "$FF_ENABLE_JOB_CLEANUP" \
 	--env "$FF_USE_FASTZIP" \
 	--env "$FF_SCRIPT_SECTIONS"
@@ -90,6 +92,7 @@ gitlab-runner register \
 	--docker-volumes '/root/print-free-space.sh:/host/print-free-space.sh:ro' \
 	--pre-clone-script '/host/bash-static /host/fix-git-dubious-ownership.sh' \
 	--pre-build-script '/host/bash-static -c "/host/bash-static /host/neofetch --backend off ; /host/bash-static /host/fix-git-dubious-ownership.sh ; /host/bash-static /host/print-free-space.sh"' \
+	--env "$FF_NETWORK_PER_BUILD" \
 	--env "$FF_ENABLE_JOB_CLEANUP" \
 	--env "$FF_USE_FASTZIP" \
 	--env "$FF_SCRIPT_SECTIONS"
