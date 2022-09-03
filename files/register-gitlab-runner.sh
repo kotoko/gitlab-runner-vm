@@ -7,6 +7,7 @@ BUILDS_DIR='/gitlab-runner/builds'
 CACHE_DIR='/gitlab-runner/cache'
 
 FF_ENABLE_JOB_CLEANUP='FF_ENABLE_JOB_CLEANUP=1'
+FF_USE_NEW_SHELL_ESCAPE='FF_USE_NEW_SHELL_ESCAPE=1'
 FF_SCRIPT_SECTIONS='FF_SCRIPT_SECTIONS=1'
 FF_USE_FASTZIP='FF_USE_FASTZIP=1'
 FF_NETWORK_PER_BUILD='FF_NETWORK_PER_BUILD=1'
@@ -50,6 +51,7 @@ gitlab-runner register \
 	--pre-build-script '/usr/bin/bash-static -c "/usr/bin/bash-static /usr/bin/neofetch --backend off ; /usr/bin/bash-static /root/print-free-space.sh"' \
 	--env "$FF_ENABLE_JOB_CLEANUP" \
 	--env "$FF_USE_FASTZIP" \
+	--env "$FF_USE_NEW_SHELL_ESCAPE" \
 	--env "$FF_SCRIPT_SECTIONS" \
 	--env "$FF_USE_IMPROVED_URL_MASKING"
 
@@ -74,6 +76,7 @@ gitlab-runner register \
 	--env "$FF_NETWORK_PER_BUILD" \
 	--env "$FF_ENABLE_JOB_CLEANUP" \
 	--env "$FF_USE_FASTZIP" \
+	--env "$FF_USE_NEW_SHELL_ESCAPE" \
 	--env "$FF_SCRIPT_SECTIONS" \
 	--env "$FF_USE_IMPROVED_URL_MASKING"
 
@@ -99,5 +102,6 @@ gitlab-runner register \
 	--env "$FF_NETWORK_PER_BUILD" \
 	--env "$FF_ENABLE_JOB_CLEANUP" \
 	--env "$FF_USE_FASTZIP" \
+	--env "$FF_USE_NEW_SHELL_ESCAPE" \
 	--env "$FF_SCRIPT_SECTIONS" \
 	--env "$FF_USE_IMPROVED_URL_MASKING"
