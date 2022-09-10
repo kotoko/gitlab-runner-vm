@@ -13,6 +13,7 @@ FF_SCRIPT_SECTIONS='FF_SCRIPT_SECTIONS=1'
 FF_USE_FASTZIP='FF_USE_FASTZIP=1'
 FF_NETWORK_PER_BUILD='FF_NETWORK_PER_BUILD=1'
 FF_USE_IMPROVED_URL_MASKING='FF_USE_IMPROVED_URL_MASKING=1'
+TRANSFER_METER_FREQUENCY='TRANSFER_METER_FREQUENCY=20s'
 
 
 if [ "$#" -ne 1 ] && [ "$#" -ne 2 ]; then
@@ -55,7 +56,8 @@ gitlab-runner register \
 	--env "$FF_USE_NEW_BASH_EVAL_STRATEGY" \
 	--env "$FF_USE_NEW_SHELL_ESCAPE" \
 	--env "$FF_SCRIPT_SECTIONS" \
-	--env "$FF_USE_IMPROVED_URL_MASKING"
+	--env "$FF_USE_IMPROVED_URL_MASKING" \
+	--env "$TRANSFER_METER_FREQUENCY"
 
 # docker
 gitlab-runner register \
@@ -81,7 +83,8 @@ gitlab-runner register \
 	--env "$FF_USE_NEW_BASH_EVAL_STRATEGY" \
 	--env "$FF_USE_NEW_SHELL_ESCAPE" \
 	--env "$FF_SCRIPT_SECTIONS" \
-	--env "$FF_USE_IMPROVED_URL_MASKING"
+	--env "$FF_USE_IMPROVED_URL_MASKING" \
+	--env "$TRANSFER_METER_FREQUENCY"
 
 # docker privileged
 gitlab-runner register \
@@ -108,4 +111,5 @@ gitlab-runner register \
 	--env "$FF_USE_NEW_BASH_EVAL_STRATEGY" \
 	--env "$FF_USE_NEW_SHELL_ESCAPE" \
 	--env "$FF_SCRIPT_SECTIONS" \
-	--env "$FF_USE_IMPROVED_URL_MASKING"
+	--env "$FF_USE_IMPROVED_URL_MASKING" \
+	--env "$TRANSFER_METER_FREQUENCY"
