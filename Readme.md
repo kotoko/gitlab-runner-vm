@@ -1,15 +1,22 @@
 # gitlab-runner-vm
 
-This repo contains script that creates virtual machine disk image using packer. Packer installs non-interactively Ubuntu Server 22.04, latest gitlab-runner and commonly used tools in CI. This repo also contains script for creating secondary disk that will be used as build directory and other directories for temporary files: /tmp, /var/tmp, /var/lib/docker.
+This repository contains script that creates virtual machine disk (file). Script creates temporary virtual machine, installs non-interactively Ubuntu Server 22.04 and latest gitlab-runner and commonly used tools in CI, deletes temporary virtual machine. The result of this script is disk image - file that can be later imported to emulator (qemu). This repository also contains script for creating secondary disk that will be used as build directory and other directories for temporary files: /tmp, /var/tmp, /var/lib/docker.
 
-Idea is you can have virtual machine with gitlab-runner and programs already installed and the only thing left to do is to register gitlab-runner to the gitlab.com server.
+Idea is that you can have virtual machine with gitlab-runner already installed and the only thing left to do is to register gitlab-runner to the gitlab.com server.
+
+## Assumptions
+
+I am assuming that you are using linux distribution (e.g. Ubuntu) for generating virtual machine. Packer supports different operating systems so if you tinker with configuration files you may make this work on Windows or macOS.
+
+I am assuming that virtual machine will be run under qemu. Generated virtual machine will have package qemu-guest-agent installed. That package improves perfomance under qemu but may also cause problems under different emulator (e.g. VirtualBox). Packer supports different emulators so if you tinker with configuration files you may make this work under VirtualBox or VMware. Make sure to not install qemu-guest-agent and also install appropriate guest package.
 
 ## Requirements
 
 Creating virtual machine image:
 
+* linux distribution (e.g. Ubuntu)
 * internet access
-* installed programs (here ubuntu packages):
+* installed programs (here Ubuntu packages):
   - ansible
   - libvirt-daemon
   - virt-manager
@@ -87,3 +94,5 @@ Script will register three tagged runners to gitlab.com server:
 * linux, amd64, shell
 * linux, amd64, docker
 * linux, amd64, docker-privileged
+
+When virtual machine is powered on and has internet access it will automatically connect to gitlab server and wait for next job to process.
