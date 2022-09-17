@@ -43,9 +43,13 @@ autoinstall:
     timezone: Europe/Warsaw
     disable_root: false
     chpasswd:
-      list: |
-        root:root
-        user1:user1
+      users:
+        - name: root
+          password: root
+          type: text
+        - name: user1
+          password: user1
+          type: text
       expire: false
   packages:
     - apt-offline
