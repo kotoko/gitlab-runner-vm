@@ -1,6 +1,8 @@
 # gitlab-runner-vm
 
-This repository contains script that creates virtual machine disk (file). Script creates temporary virtual machine, installs non-interactively Ubuntu Server 22.04 and latest gitlab-runner and commonly used tools in CI, deletes temporary virtual machine. The result of this script is disk image - file that can be later imported to emulator (qemu). This repository also contains script for creating secondary disk that will be used as build directory and other directories for temporary files: /tmp, /var/tmp, /var/lib/docker.
+This repository contains script that creates virtual machine disk (file).
+
+Script creates temporary virtual machine, installs non-interactively Ubuntu Server 22.04 and latest gitlab-runner and commonly used tools in CI, deletes temporary virtual machine. The result of this script is disk image - file that can be later imported to emulator (qemu). This repository also contains script for creating secondary disk that will be used as build directory and also for files in directories: /tmp, /var/tmp, /var/lib/docker.
 
 Idea is that you can have virtual machine with gitlab-runner already installed and the only thing left to do is to register gitlab-runner to the gitlab.com server.
 
