@@ -82,6 +82,30 @@ After uncommenting:
 
 Generate virtual machine image again.
 
+### Error "failed to transfer file"
+
+It is possible that generating virtual machine fails with error "failed to transfer file". [It is problem with packer](https://github.com/hashicorp/packer-plugin-ansible/issues/110). Packer uses default ssh settings which have changed in openssh 9. If you have recent ssh client version (you should have) then this error will appear.
+
+As a workaround you can re-enable old behaviour with additional parameters. Edit file `gitlab-runner.pkr.hcl` and append `"--scp-extra-args", "'-O'"` to `extra_arguments`.
+
+Original file:
+
+```
+    extra_arguments = [
+      "--extra-vars", "ansible_sudo_pass=user1"
+    ]
+```
+
+With workaround:
+
+```
+    extra_arguments = [
+      "--extra-vars", "ansible_sudo_pass=user1", "--scp-extra-args", "'-O'"
+    ]
+```
+
+Generate virtual machine image again.
+
 ## Run virtual machine
 
 There are 2 user accounts configured: `root` (administrator) and `user1` (normal account with ability to sudo as root). Password is the same as login.
