@@ -3,7 +3,7 @@
 set -e
 set -u
 
-echo "$0"
+echo "Running $0"
 
 if command -v git >/dev/null 2>/dev/null; then
 	echo 'git config --global safe.directory "*"'
