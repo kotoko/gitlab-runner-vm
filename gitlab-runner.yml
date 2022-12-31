@@ -66,15 +66,15 @@
             special_time: 'reboot'
             job: '/usr/bin/chown gitlab-runner:gitlab-runner {{ item }}'
 
-        - name: 'configure cron for deleting outdated docker containers'
+        - name: 'configure cron for cleaning up docker'
           loop:
             - 'daily'
             - 'reboot'
           cron:
-            name: 'clean up docker containers created by gitlab-runner'
+            name: 'clean up docker'
             user: 'root'
             special_time: '{{ item }}'
-            job: '/bin/bash /usr/share/gitlab-runner/clear-docker-cache prune'
+            job: '/usr/bin/docker system prune --all --volumes --force'
 
         - name: 'copy script register-gitlab-runner.sh'
           copy:
