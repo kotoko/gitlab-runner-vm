@@ -103,6 +103,7 @@ gitlab-runner register \
 	--docker-volumes '/usr/bin/neofetch:/host/neofetch:ro' \
 	--docker-volumes '/root/fix-git-dubious-ownership.sh:/host/fix-git-dubious-ownership.sh:ro' \
 	--docker-volumes '/root/print-free-space.sh:/host/print-free-space.sh:ro' \
+	--docker-volumes '/var/run/docker.sock:/var/run/docker.sock:rw' \
 	--pre-clone-script '/host/bash-static /host/fix-git-dubious-ownership.sh' \
 	--pre-build-script '/host/bash-static -c "/host/bash-static /host/neofetch --backend off ; /host/bash-static /host/fix-git-dubious-ownership.sh ; /host/bash-static /host/print-free-space.sh"' \
 	--env "$FF_NETWORK_PER_BUILD" \
