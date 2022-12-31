@@ -21,6 +21,12 @@
       apt:
         update_cache: true
 
+    - name: 'disable service snapd'
+      systemd:
+        name: 'snapd'
+        enabled: no
+        masked: yes
+
     - name: 'gitlab-runner'
       block:
         - name: 'get gitlab-runner deb package'
