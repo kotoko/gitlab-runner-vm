@@ -89,13 +89,22 @@
             owner: 'root'
             mode: '700'
 
-        - name: 'copy scripts to /root'
+        - name: 'create directory /root/ci'
+          file:
+            path: '/root/ci'
+            state: directory
+            mode: '755'
+            owner: 'root'
+            group: 'root'
+
+        - name: 'copy scripts to /root/ci'
           loop:
             - 'fix-git-dubious-ownership.sh'
             - 'print-free-space.sh'
+            - 'reset-home-directory.sh'
           copy:
-            src: 'files/{{ item }}'
-            dest: '/root/{{ item }}'
+            src: 'files/root_ci/{{ item }}'
+            dest: '/root/ci/{{ item }}'
             owner: 'root'
             mode: '755'
 
