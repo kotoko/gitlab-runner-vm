@@ -41,7 +41,7 @@ build {
 
   provisioner "ansible" {
     user = "user1"
-    playbook_file = "./gitlab-runner.yml"
+    playbook_file = "./provision.yml"
 
     extra_arguments = [
       "--extra-vars", "ansible_sudo_pass=user1"
