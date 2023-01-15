@@ -67,7 +67,7 @@ guestmount --format='qcow2' -a "${DISK_PATH}" -m '/dev/sda1' "${MOUNT_DIR}"
 for d in 'gitlab-runner-builds' 'gitlab-runner-cache' 'tmp' 'var-tmp' 'docker'; do
 	mkdir -p -m 777 "${MOUNT_DIR}/${d}"
 done
-sync
+sync ; sync ; sleep 2
 guestunmount "${MOUNT_DIR}"
 
 # Save artifact
