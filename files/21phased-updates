@@ -1,6 +1,9 @@
 // Phased updates
-// Enable phased updates and get updates early:
+// Disable phased updates and get updates early:
 //    APT::Get::Always-Include-Phased-Updates: True;
+//    Update-Manager::Always-Include-Phased-Updates;
 // Disable phased updates and get updates late:
 //    APT::Get::Never-Include-Phased-Updates: True;
+//    Update-Manager::Never-Include-Phased-Updates;
 APT::Get::Never-Include-Phased-Updates: True;
+Update-Manager::Never-Include-Phased-Updates;
