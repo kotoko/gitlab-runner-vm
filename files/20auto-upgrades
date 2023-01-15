@@ -19,7 +19,3 @@ APT::Periodic::AutocleanInterval "0";
 //     2:  + command outputs     (remove -qq, remove 2>/dev/null, add -d)
 //     3:  + trace on
 APT::Periodic::Verbose "0";
-
-// Disable phased updates
-Update-Manager::Never-Include-Phased-Updates;
-APT::Get::Never-Include-Phased-Updates: True;

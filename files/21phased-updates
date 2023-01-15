@@ -1,0 +1,6 @@
+// Phased updates
+// Enable phased updates and get updates early:
+//    APT::Get::Always-Include-Phased-Updates: True;
+// Disable phased updates and get updates late:
+//    APT::Get::Never-Include-Phased-Updates: True;
+APT::Get::Never-Include-Phased-Updates: True;

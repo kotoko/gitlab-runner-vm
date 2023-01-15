@@ -17,6 +17,13 @@
         owner: 'root'
         mode: '644'
 
+- name: 'configure phased updates'
+      copy:
+        src: 'files/21phased-updates'
+        dest: '/etc/apt/apt.conf.d/21phased-updates'
+        owner: 'root'
+        mode: '644'
+
     - name: 'update apt cache'
       apt:
         update_cache: true
